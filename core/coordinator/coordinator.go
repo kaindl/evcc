@@ -128,7 +128,7 @@ func (c *Coordinator) availableDetectibleVehicles(owner loadpoint.API) []api.Veh
 }
 
 // identifyVehicleByStatus finds active vehicle by charge state
-func (c *Coordinator) identifyVehicleByStatus(available []api.Vehicle, lp loadpoint.API) api.Vehicle {
+func (c *Coordinator) identifyVehicleByStatus(available []api.Vehicle, lpStatus api.ChargeStatus) api.Vehicle {
 	var res api.Vehicle
 
 	c.mu.RLock()
@@ -147,7 +147,7 @@ func (c *Coordinator) identifyVehicleByStatus(available []api.Vehicle, lp loadpo
 			c.log.DEBUG.Printf("vehicle status: %s (%s)", status, vehicle.GetTitle())
 
 			// vehicle is plugged or charging and has the same state as the charger, so it should be the right one
-			if (status == api.StatusB || status == api.StatusC) && status == lp.GetStatus() {
+			if (status == api.StatusB || status == api.StatusC) && status == lpStatus {
 				if res != nil {
 					c.log.WARN.Println("vehicle status: >1 matches, giving up")
 					return nil
