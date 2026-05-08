@@ -42,8 +42,7 @@ func TestVehicleDetectByStatus(t *testing.T) {
 	v1.MockVehicle.EXPECT().Identifiers().Return(nil).AnyTimes()
 	v2.MockVehicle.EXPECT().Identifiers().Return([]string{"it's me"}).AnyTimes()
 
-	lp := loadpoint.NewMockAPI(ctrl)
-	lp.EXPECT().GetStatus().Return(api.StatusB).AnyTimes()
+	var lp loadpoint.API
 	c := New(log, vehicles)
 
 	for _, tc := range tc {
@@ -53,7 +52,7 @@ func TestVehicleDetectByStatus(t *testing.T) {
 		v2.MockChargeState.EXPECT().Status().Return(tc.v2, nil)
 
 		available := c.availableDetectibleVehicles(lp) // include id-able vehicles
-		res := c.identifyVehicleByStatus(available, lp)
+		res := c.identifyVehicleByStatus(available, api.StatusB)
 		if tc.res != res {
 			t.Errorf("expected %v, got %v", tc.res, res)
 		}
