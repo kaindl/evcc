@@ -191,11 +191,11 @@ params:
       de: "Kann meist erst später eingetragen werden, siehe: https://docs.evcc.io/docs/features/vehicle"
       en: "Mostly this can be added later, see: https://docs.evcc.io/en/docs/features/vehicle"
     type: list
-  - name: ExcludedFromAutoDiscovery
+  - name: AutoDiscoveryEnabled
     type: bool
     description:
-      de: Von automatischer Erkennung ausschließen
-      en: Exclude from auto discovery
+      de: Automatische Erkennung aktivieren
+      en: Enable auto discovery
   - name: priority
     description:
       de: Priorität
@@ -534,12 +534,13 @@ presets:
       advanced: true
     - name: identifiers
       advanced: true
-    - name: ExcludedFromAutoDiscovery
+    - name: AutoDiscoveryEnabled
       advanced: true
       type: bool
+      default: true
       description:
-        de: Von automatischer Erkennung ausschließen
-        en: Exclude from auto discovery
+        de: Automatische Erkennung aktivieren
+        en: Enable auto discovery
     - name: priority
       advanced: true
     - name: cache
@@ -563,12 +564,13 @@ presets:
       advanced: true
     - name: identifiers
       advanced: true
-    - name: ExcludedFromAutoDiscovery
+    - name: AutoDiscoveryEnabled
       advanced: true
       type: bool
+      default: true
       description:
-        de: Von automatischer Erkennung ausschließen
-        en: Exclude from auto discovery
+        de: Automatische Erkennung aktivieren
+        en: Enable auto discovery
     - name: priority
       advanced: true
   vehicle-features:
