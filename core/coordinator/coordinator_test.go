@@ -36,6 +36,11 @@ func TestVehicleDetectByStatus(t *testing.T) {
 		{"A/B, v2     excluded from AutoDiscovery ->0", api.StatusA, api.StatusB, true, nil},
 		{"B/B, v2 not excluded from AutoDiscovery ->0", api.StatusB, api.StatusB, false, nil},
 		{"B/B, v2     excluded from AutoDiscovery ->1", api.StatusB, api.StatusB, true, v1},
+		{"B/C, v2 not excluded from AutoDiscovery ->1", api.StatusB, api.StatusC, false, v1},
+		{"B/C, v2 not excluded from AutoDiscovery ->1", api.StatusB, api.StatusC, false, v1},
+		{"C/B, v2 not excluded from AutoDiscovery ->2", api.StatusC, api.StatusB, false, v2},
+		{"C/B, v2 not excluded from AutoDiscovery ->2", api.StatusC, api.StatusB, false, v2},
+		{"C/C, v2 not excluded from AutoDiscovery ->0", api.StatusC, api.StatusC, false, nil},
 	}
 
 	log := util.NewLogger("foo")
