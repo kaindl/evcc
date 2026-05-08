@@ -27,15 +27,15 @@ func TestVehicleDetectByStatus(t *testing.T) {
 		res                api.Vehicle
 	}
 	tc := []testcase{
-		{"A/A->0", api.StatusA, api.StatusA, true, nil},
-		{"B/A->1", api.StatusB, api.StatusA, true, v1},
-		{"B/A->1", api.StatusB, api.StatusA, true, v1},
-		{"A/B->2", api.StatusA, api.StatusB, true, v2},
-		{"A/B->2", api.StatusA, api.StatusB, true, v2},
-		{"A/B->2", api.StatusA, api.StatusB, false, nil},
-		{"A/B->2", api.StatusA, api.StatusB, false, nil},
-		{"B/B->1", api.StatusB, api.StatusB, true, nil},
-		{"B/B->1", api.StatusB, api.StatusB, false, v1},
+		{"A/A, v2 autodiscoverable ->0", api.StatusA, api.StatusA, true, nil},
+		{"B/A, v2 autodiscoverable ->1", api.StatusB, api.StatusA, true, v1},
+		{"B/A, v2 autodiscoverable ->1", api.StatusB, api.StatusA, true, v1},
+		{"A/B, v2 autodiscoverable ->2", api.StatusA, api.StatusB, true, v2},
+		{"A/B, v2 autodiscoverable ->2", api.StatusA, api.StatusB, true, v2},
+		{"A/B, v2 not autodiscoverable ->0", api.StatusA, api.StatusB, false, nil},
+		{"A/B, v2 not autodiscoverable ->0", api.StatusA, api.StatusB, false, nil},
+		{"B/B, v2 autodiscoverable ->0", api.StatusB, api.StatusB, true, nil},
+		{"B/B, v2 not autodiscoverable ->1", api.StatusB, api.StatusB, false, v1},
 	}
 
 	log := util.NewLogger("foo")
