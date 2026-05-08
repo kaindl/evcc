@@ -32,6 +32,11 @@ func TestVehicleDetectByStatus(t *testing.T) {
 		{"A/B->2", api.StatusA, api.StatusB, v2},
 		{"A/B->2", api.StatusA, api.StatusB, v2},
 		{"B/B->1", api.StatusB, api.StatusB, nil},
+		{"B/C->1", api.StatusB, api.StatusC, v1},
+		{"B/C->1", api.StatusB, api.StatusC, v1},
+		{"C/B->2", api.StatusC, api.StatusB, v2},
+		{"C/B->2", api.StatusC, api.StatusB, v2},
+		{"C/C->1", api.StatusC, api.StatusC, nil},
 	}
 
 	log := util.NewLogger("foo")
