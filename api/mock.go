@@ -513,20 +513,6 @@ func (m *MockVehicle) EXPECT() *MockVehicleMockRecorder {
 	return m.recorder
 }
 
-// AutoDiscoveryEnabled mocks base method.
-func (m *MockVehicle) AutoDiscoveryEnabled() bool {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AutoDiscoveryEnabled")
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// AutoDiscoveryEnabled indicates an expected call of AutoDiscoveryEnabled.
-func (mr *MockVehicleMockRecorder) AutoDiscoveryEnabled() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AutoDiscoveryEnabled", reflect.TypeOf((*MockVehicle)(nil).AutoDiscoveryEnabled))
-}
-
 // Capacity mocks base method.
 func (m *MockVehicle) Capacity() float64 {
 	m.ctrl.T.Helper()
@@ -539,6 +525,20 @@ func (m *MockVehicle) Capacity() float64 {
 func (mr *MockVehicleMockRecorder) Capacity() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Capacity", reflect.TypeOf((*MockVehicle)(nil).Capacity))
+}
+
+// ExcludedFromAutoDiscovery mocks base method.
+func (m *MockVehicle) ExcludedFromAutoDiscovery() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExcludedFromAutoDiscovery")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// ExcludedFromAutoDiscovery indicates an expected call of ExcludedFromAutoDiscovery.
+func (mr *MockVehicleMockRecorder) ExcludedFromAutoDiscovery() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExcludedFromAutoDiscovery", reflect.TypeOf((*MockVehicle)(nil).ExcludedFromAutoDiscovery))
 }
 
 // Features mocks base method.
