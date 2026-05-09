@@ -347,7 +347,7 @@ func TestReconnectVehicle(t *testing.T) {
 			expectVehiclePublish(v)
 			vehicle.MockVehicle.EXPECT().Identifiers().AnyTimes().Return(tc.vehicleId)
 			vehicle.MockVehicle.EXPECT().Soc().Return(0.0, nil).AnyTimes()
-			vehicle.MockVehicle.EXPECT().AutoDiscoveryEnabled().Return(true).AnyTimes()
+			vehicle.MockVehicle.EXPECT().ExcludedFromAutoDiscovery().Return(false).AnyTimes()
 
 			charger := api.NewMockCharger(ctrl)
 			charger.EXPECT().Status().Return(api.StatusB, nil).AnyTimes()

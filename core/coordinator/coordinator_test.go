@@ -22,20 +22,20 @@ func TestVehicleDetectByStatus(t *testing.T) {
 
 	type testcase struct {
 		string
-		v1, v2             api.ChargeStatus
-		v2autodiscoverable bool
-		res                api.Vehicle
+		v1, v2                      api.ChargeStatus
+		v2ExcludedFromAutoDiscovery bool
+		res                         api.Vehicle
 	}
 	tc := []testcase{
-		{"A/A, v2 autodiscoverable ->0", api.StatusA, api.StatusA, true, nil},
-		{"B/A, v2 autodiscoverable ->1", api.StatusB, api.StatusA, true, v1},
-		{"B/A, v2 autodiscoverable ->1", api.StatusB, api.StatusA, true, v1},
-		{"A/B, v2 autodiscoverable ->2", api.StatusA, api.StatusB, true, v2},
-		{"A/B, v2 autodiscoverable ->2", api.StatusA, api.StatusB, true, v2},
-		{"A/B, v2 not autodiscoverable ->0", api.StatusA, api.StatusB, false, nil},
-		{"A/B, v2 not autodiscoverable ->0", api.StatusA, api.StatusB, false, nil},
-		{"B/B, v2 autodiscoverable ->0", api.StatusB, api.StatusB, true, nil},
-		{"B/B, v2 not autodiscoverable ->1", api.StatusB, api.StatusB, false, v1},
+		{"A/A, v2 not excluded from AutoDiscovery ->0", api.StatusA, api.StatusA, false, nil},
+		{"B/A, v2 not excluded from AutoDiscovery ->1", api.StatusB, api.StatusA, false, v1},
+		{"B/A, v2 not excluded from AutoDiscovery ->1", api.StatusB, api.StatusA, false, v1},
+		{"A/B, v2 not excluded from AutoDiscovery ->2", api.StatusA, api.StatusB, false, v2},
+		{"A/B, v2 not excluded from AutoDiscovery ->2", api.StatusA, api.StatusB, false, v2},
+		{"A/B, v2     excluded from AutoDiscovery ->0", api.StatusA, api.StatusB, true, nil},
+		{"A/B, v2     excluded from AutoDiscovery ->0", api.StatusA, api.StatusB, true, nil},
+		{"B/B, v2 not excluded from AutoDiscovery ->0", api.StatusB, api.StatusB, false, nil},
+		{"B/B, v2     excluded from AutoDiscovery ->1", api.StatusB, api.StatusB, true, v1},
 	}
 
 	log := util.NewLogger("foo")
@@ -45,7 +45,8 @@ func TestVehicleDetectByStatus(t *testing.T) {
 	v2.MockVehicle.EXPECT().GetTitle().Return("v2").AnyTimes()
 	v1.MockVehicle.EXPECT().Identifiers().Return(nil).AnyTimes()
 	v2.MockVehicle.EXPECT().Identifiers().Return([]string{"it's me"}).AnyTimes()
-	v1.MockVehicle.EXPECT().AutoDiscoveryEnabled().Return(true).AnyTimes()
+
+	v1.MockVehicle.EXPECT().ExcludedFromAutoDiscovery().Return(false).AnyTimes()
 
 	var lp loadpoint.API
 	c := New(log, vehicles)
@@ -54,8 +55,8 @@ func TestVehicleDetectByStatus(t *testing.T) {
 		t.Logf("%+v", tc)
 
 		v1.MockChargeState.EXPECT().Status().Return(tc.v1, nil)
-		v2.MockVehicle.EXPECT().AutoDiscoveryEnabled().Return(tc.v2autodiscoverable)
-		if tc.v2autodiscoverable {
+		v2.MockVehicle.EXPECT().ExcludedFromAutoDiscovery().Return(tc.v2ExcludedFromAutoDiscovery)
+		if !tc.v2ExcludedFromAutoDiscovery {
 			v2.MockChargeState.EXPECT().Status().Return(tc.v2, nil)
 		}
 

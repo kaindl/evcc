@@ -38,8 +38,8 @@ identifiers:
 {{- end }}
 {{- end }}
 
-{{- if .AutoDiscoveryEnabled }}
-AutoDiscoveryEnabled: {{.AutoDiscoveryEnabled}}
+{{- if .ExcludedFromAutoDiscovery }}
+ExcludedFromAutoDiscovery: {{.ExcludedFromAutoDiscovery}}
 {{- end }}
 
 {{- end }}
