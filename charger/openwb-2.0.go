@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"slices"
+	"time"
 
 	"github.com/evcc-io/evcc/api"
 	"github.com/evcc-io/evcc/api/implement"
@@ -14,13 +16,15 @@ import (
 // OpenWB20 charger implementation
 type OpenWB20 struct {
 	implement.Caps
-	log       *util.Logger
-	conn      *modbus.Connection
-	enabled   bool
-	curr      uint16
-	base      uint16
-	rfid      bool
-	connected bool
+	log          *util.Logger
+	conn         *modbus.Connection
+	enabled      bool
+	curr         uint16
+	base         uint16
+	rfid         bool
+	connected    bool
+	lastidtime   time.Time
+	lastidentify []string
 }
 
 const (
@@ -39,6 +43,7 @@ const (
 	openwbRegHeartbeat    = 10190
 	openwbRegResetRfid    = 10197
 	openwbRegCpTrigger    = 10198
+	rfidTagResetTime      = 2 * time.Minute
 )
 
 func init() {
@@ -106,27 +111,31 @@ func NewOpenWB20(ctx context.Context, settings modbus.TcpSettings, connector uin
 	return wb, nil
 }
 
+func (wb *OpenWB20) resetRfid() {
+	if wb.rfid && (wb.connected || time.Since(wb.lastidtime) > rfidTagResetTime) {
+		if _, err := wb.conn.WriteSingleRegister(wb.base+openwbRegResetRfid, 1); err != nil {
+			wb.log.WARN.Printf("reset rfid: %v", err)
+			return
+		}
+		wb.connected = false
+		wb.lastidtime = time.Time{}
+		wb.lastidentify = nil
+	}
+}
+
 // Status implements the api.Charger interface
 func (wb *OpenWB20) Status() (api.ChargeStatus, error) {
 	if b, err := wb.conn.ReadInputRegisters(wb.base+openwbRegCharging, 1); err != nil || binary.BigEndian.Uint16(b) == 1 {
-		wb.connected = wb.connected || err == nil
+		wb.connected = true || err == nil
 		return api.StatusC, err
 	}
 
 	if b, err := wb.conn.ReadInputRegisters(wb.base+openwbRegPlugged, 1); err != nil || binary.BigEndian.Uint16(b) == 1 {
-		wb.connected = wb.connected || err == nil
+		wb.connected = true || err == nil
 		return api.StatusB, err
 	}
-
-	// reset RFID tag on disconnect, retried until successful (requires openWB 2.3.0)
-	if wb.rfid && wb.connected {
-		// keep the disconnect visible to the loadpoint
-		if _, err := wb.conn.WriteSingleRegister(wb.base+openwbRegResetRfid, 1); err != nil {
-			wb.log.WARN.Printf("reset rfid: %v", err)
-		} else {
-			wb.connected = false
-		}
-	}
+	// reset RFID tag on disconnect or after timeout, retried until successful (requires openWB 2.3.0)
+	wb.resetRfid()
 
 	return api.StatusA, nil
 }
@@ -252,7 +261,14 @@ func (wb *OpenWB20) identify() ([]string, error) {
 		return nil, err
 	}
 	if id := bytesAsString(b); id != "" {
-		return []string{id}, nil
+		newID := []string{id}
+		if !slices.Equal(wb.lastidentify, newID) {
+			wb.lastidtime = time.Now()
+			wb.lastidentify = newID
+		}
+		return newID, nil
 	}
+	wb.lastidtime = time.Time{}
+	wb.lastidentify = nil
 	return nil, nil
 }
