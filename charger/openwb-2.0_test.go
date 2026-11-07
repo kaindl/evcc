@@ -5,6 +5,7 @@ import (
 	"net"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/andig/mbserver"
 	"github.com/evcc-io/evcc/api"
@@ -51,6 +52,12 @@ func (h *openWB20Handler) set(plugged uint16, failReset bool) {
 	h.plugged, h.failReset = plugged, failReset
 }
 
+func (h *openWB20Handler) reset() {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.resets = 0
+}
+
 func (h *openWB20Handler) count() int {
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -94,4 +101,29 @@ func TestOpenWB20RfidReset(t *testing.T) {
 	_, err = wb.Status()
 	require.NoError(t, err)
 	require.Equal(t, 1, h.count())
+
+	// timeout reset not too early
+	h.reset()
+	h.set(0, false)
+	wb.lastidtime = time.Now().Add(-(rfidTagResetTime / 2))
+	_, err = wb.Status()
+	require.NoError(t, err)
+	require.Zero(t, h.count())
+
+	// timeout reset after timeout
+	h.reset()
+	h.set(0, false)
+	wb.lastidtime = time.Now().Add(-(2 * rfidTagResetTime))
+	_, err = wb.Status()
+	require.NoError(t, err)
+	require.Equal(t, 1, h.count())
+
+	// no timeout reset when plugged in
+	h.reset()
+	h.set(1, false)
+	wb.lastidtime = time.Now().Add(-(2 * rfidTagResetTime))
+	status, err = wb.Status()
+	require.NoError(t, err)
+	require.Equal(t, api.StatusB, status)
+	require.Zero(t, h.count())
 }
