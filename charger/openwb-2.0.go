@@ -43,6 +43,7 @@ const (
 	openwbRegHeartbeat    = 10190
 	openwbRegResetRfid    = 10197
 	openwbRegCpTrigger    = 10198
+	cpDisconnectSeconds   = 1
 	rfidTagResetTime      = 2 * time.Minute
 )
 
@@ -250,7 +251,7 @@ var _ api.Resurrector = (*OpenWB20)(nil)
 
 // WakeUp implements the api.Resurrector interface
 func (wb *OpenWB20) WakeUp() error {
-	_, err := wb.conn.WriteSingleRegister(wb.base+openwbRegCpTrigger, 1)
+	_, err := wb.conn.WriteSingleRegister(wb.base+openwbRegCpTrigger, cpDisconnectSeconds)
 	return err
 }
 
