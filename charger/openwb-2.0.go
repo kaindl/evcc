@@ -113,7 +113,7 @@ func NewOpenWB20(ctx context.Context, settings modbus.TcpSettings, connector uin
 }
 
 func (wb *OpenWB20) resetRfid() {
-	if wb.rfid && (wb.connected || time.Since(wb.lastidtime) > rfidTagResetTime) {
+	if wb.rfid && (wb.connected || (!wb.lastidtime.IsZero() && time.Since(wb.lastidtime) > rfidTagResetTime)) {
 		if _, err := wb.conn.WriteSingleRegister(wb.base+openwbRegResetRfid, 1); err != nil {
 			wb.log.WARN.Printf("reset rfid: %v", err)
 			return
